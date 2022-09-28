@@ -54,11 +54,11 @@
                     </thead>
                     <tbody>
                         <tr>
-                            <td>${info_detalle.id}</td>
-                            <td>${info_detalle.fechaCreacion}</td>
-                            <td>${info_detalle.fechaEntrega}</td>
-                            <td>${info_detalle.descripcion}</td>
-                            <td>${info_detalle.estadoTarea}</td>
+                            <td class="modal_detalle">${info_detalle.id}</td>
+                            <td class="modal_detalle">${info_detalle.fechaCreacion}</td>
+                            <td class="modal_detalle">${info_detalle.fechaEntrega}</td>
+                            <td class="modal_detalle">${info_detalle.descripcion}</td>
+                            <td class="modal_detalle">${info_detalle.estadoTarea}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -76,6 +76,12 @@
            */
            function eliminarDetalle()
            {
+            let elementos_td_clase = document.querySelectorAll('.modal_detalle')
+            console.log(elementos_td_clase)
+            for (let i = 0; i < elementos_td_clase.length; i++) {
+                elementos_td_clase[i].innerHTML = ""
+            }
+
             console.log('Funcion para eliminar el HTML interior de la ventana')
            }
 
@@ -85,20 +91,130 @@
            Luego de capturar la informacion se debe enviar la informacion al servidor a traves
            de fetch y guardar la informacion enviada en el servidor
            Al recibir la confirmacion del servidor se debe eliminar la totalidad de informacion
-           al interior de la venta
+           al interior de la ventana
            No olvidar agregar los datos principales a la tabla con javascript, capturar la tabla y
            anexar los datos de la nueva tarea como una fila nueva
-           Al infalizar el codigo recordar eliminar la informacion al interior de los inputs definidos
+           Al finalizar el codigo recordar eliminar la informacion al interior de los inputs definidos
            */
            function nuevaTarea()
            {
             console.log('Crear nueva tarea')
             //Escribir su codigo aqui
-
+            let modal_NuevaTarea = document.querySelector('.modalNuevaTarea')
+            let nuevosElementos = `
+            <div class="container">
+                <div class="row">
+                    <div class="col-xl-8 offset-xl-2">
+                        
+                        <form id="contact-form" method="post" action="#" role="form" novalidate="true">
+                            {% csrf_token %}
+                            <div class="controls">
+                                <div class="row">
+                                    <div class="col-lg-6">
+                                        <div class="form-group">
+                                            <label for="form_name">Descripción de la tarea</label>
+                                            <textarea id="nombreTarea" class="form-control" name="nombreTarea" style="height: 100px; width: 480px;"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-6">
+                                        <div class="form-group">
+                                            <label for="form_email">Fecha de creación</label>
+                                            <input id="fechaCreacion" type="text" class="form-control" name="fechaCreacion">
+                                            
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <div class="form-group">
+                                            <label for="form_phone">Fecha de entrega</label>
+                                            <input id="fechaEntrega" type="text" class="form-control" name="fechaEntrega">
+                                            
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-6">
+                                        <div class="form-group">
+                                            <label for="form_email">Estado de la tarea</label>
+                                            <input id="estadoTarea" type="text"  class="form-control" name="estadoTarea">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+                `
+            modal_NuevaTarea.innerHTML = nuevosElementos
+            
             //Fin del codigo
             $(".modal-backdrop").remove();
             $('#nuevaTarea').hide()
            }
+           function agregarTarea()
+           {
+            let nombreTarea = document.getElementById('nombreTarea').value
+            let fechaCreacion = document.getElementById('fechaCreacion').value
+            let fechaEntrega = document.getElementById('fechaEntrega').value
+            let estadoTarea = document.getElementById('estadoTarea').value
+
+            informacion_tarea = {
+                'descripcion':`${nombreTarea}`,
+                'fechaCreacion':`${fechaCreacion}`,
+                'fechaEntrega':`${fechaEntrega}`,
+                'estadoTarea':`${estadoTarea}`
+            }
+            console.log(informacion_tarea)
+
+            fetch(`/examenFinal/guardarTarea`,{
+                method:'POST',
+                headers:{
+                    "X-Request-With":"XMLHttpRequest",
+                    "X-CSRFToken":getCookie("csrftoken")
+                },
+                body:JSON.stringify(informacion_tarea)
+            })
+            .then(response => response.json())
+            .then(data=>{
+                console.log(data)
+                eliminarNuevo()
+                info_tarea = data.tarea
+                let nueva_fila = `
+                <tr>
+                    <td scope="row">${info_tarea[0]}</td>
+                    <td>${info_tarea[1]}</td>
+                    <td>${info_tarea[3]}</td>
+                    <td style="text-align: center;"><a id="{{ tarea.id }}" class="btn btn-info" style="color: black;" data-bs-toggle="modal" data-bs-target="#verDetalle" onclick="mostrarDetalle(this.id)"><i class="fa fa-eye"></i></a></td>
+                    <td style="text-align: center;"><a id="{{ tarea.id }}" class="btn btn-warning" style="color: black;" data-bs-toggle="modal" data-bs-target="#editarTarea" onclick="editarTarea(this.id)"><i class="fa fa-edit"></i></a></td>
+                    <td style="text-align: center;"><a id="{{ tarea.id }}" class="btn btn-danger" style="color: white;" onclick="eliminarTarea(this.id)"><i class="fa fa-trash"></i></a></td>
+                </tr>
+                `
+                let tabla_tareas = document.querySelector('#tabla_tareas')
+                tabla_tareas.innerHTML += nueva_fila
+            })
+            }
+
+            //Funcion para obtener token CSRF
+            function getCookie(name)
+            {
+                let cookieValue = null
+                if (document.cookie && document.cookie !== "")
+                {
+                    const cookies = document.cookie.split(';')
+                    for (let i = 0; i < cookies.length; i++)
+                    {
+                        const cookie = cookies[i].trim()
+                        if (cookie.substring(0,name.length + 1) == (name + "="))
+                        {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1))
+                        }
+                    }
+                }
+                return cookieValue
+            }
+           
 
            /*
            Capturar los input de la ventana modal para nuevaTarea y eliminar el valor al interior de 
@@ -106,7 +222,10 @@
            */
            function eliminarNuevo()
            {
-
+            let elementos_inputs_nuevaTarea = document.querySelectorAll('.form-control')
+            for (let i = 0; i < elementos_inputs_nuevaTarea.length; i++) {
+                elementos_inputs_nuevaTarea[i].innerHTML = ""
+            }
            }
 
            //PREGUNTA 2-2
@@ -150,7 +269,7 @@
             <h1>Tareas del examen final</h1>
             <br>
             <div>
-                <a class="btn btn-success float-start" style="color: white;" data-bs-toggle="modal" data-bs-target="#nuevaTarea">Nuevo<i class="fa fa-plus"></i></a>
+                <a class="btn btn-success float-start" style="color: white;" onclick="nuevaTarea()" data-bs-toggle="modal" data-bs-target="#nuevaTarea">Nuevo<i class="fa fa-plus"></i></a>
                 <a class="btn btn-success float-end" style="color: white;" href="{% url 'examenFinal:index' %}">Salir</a>
             </div>
             <br>
@@ -166,7 +285,7 @@
                         <th scope="col">Eliminar tarea</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="tabla_tareas">
                 {% for tarea in tareas_totales %}
                 <tr>
                     <td scope="row">{{ tarea.fechaCreacion }}</td>
@@ -191,17 +310,20 @@
     Recordar eliminar la informacion al interior de los input cuando la tarea haya sido guardada.
 -->
 <div class="modal fade" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" role="dialog" id="nuevaTarea">
-    <div class="modal-dialog" role="document">
+    <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Agregar tarea</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="eliminarNuevo()"></button>
             </div>
             <div class="modal-body">
+                <div class="modalNuevaTarea">
+
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="eliminarNuevo()">Cancelar</button>
-                <button type="submit" class="btn btn-primary" onclick="nuevaTarea()">Agregar</button>
+                <button type="submit" class="btn btn-primary" data-bs-dismiss="modal" onclick="agregarTarea()">Agregar</button>
             </div>
         </div>
     </div>
@@ -217,7 +339,7 @@
     No olvidar crear un input readonly para mostrar el id de la tarea y enviarla al servidor
 -->
 <div class="modal fade" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" role="dialog" id="editarTarea">
-    <div class="modal-dialog" role="document">
+    <div class="modal-dialog " role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Editar tarea</h5>

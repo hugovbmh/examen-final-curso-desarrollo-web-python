@@ -42,3 +42,20 @@ def obtener_info_tarea(request):
             'estadoTarea': tarea.estadoTarea
         }
     })
+def guardarTarea(request):
+    informacion_tarea = json.load(request)
+    descripcion = informacion_tarea.get('descripcion')
+    fechaCreacion = informacion_tarea.get('fechaCreacion')
+    fechaEntrega = informacion_tarea.get('fechaEntrega')
+    estadoTarea = informacion_tarea.get('estadoTarea')
+    print(descripcion)
+    print(fechaCreacion)
+    print(fechaEntrega)
+    print(estadoTarea)
+    tareasExamen(fechaCreacion=fechaCreacion,fechaEntrega=fechaEntrega,descripcion=descripcion,estadoTarea=estadoTarea).save()
+
+    nueva_tarea = [fechaCreacion,fechaEntrega,descripcion,estadoTarea]
+    
+    return JsonResponse({
+        'tarea': nueva_tarea
+    })
