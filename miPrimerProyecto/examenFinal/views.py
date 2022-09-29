@@ -53,9 +53,18 @@ def guardarTarea(request):
     print(fechaEntrega)
     print(estadoTarea)
     tareasExamen(fechaCreacion=fechaCreacion,fechaEntrega=fechaEntrega,descripcion=descripcion,estadoTarea=estadoTarea).save()
-
-    nueva_tarea = [fechaCreacion,fechaEntrega,descripcion,estadoTarea]
+    newTask = tareasExamen.objects.latest('id')
+    nueva_tarea = [newTask.id,fechaCreacion,fechaEntrega,descripcion,estadoTarea]
     
     return JsonResponse({
         'tarea': nueva_tarea
+    })
+
+def eliminarTarea(request):
+    id_recibido = str(request.GET.get('id'))
+    tarea_eliminar = tareasExamen.objects.get(id=id_recibido)
+    tarea_eliminar_lista = [tarea_eliminar.id,tarea_eliminar.fechaCreacion,tarea_eliminar.fechaEntrega,tarea_eliminar.descripcion,tarea_eliminar.estadoTarea]
+    tareasExamen.objects.get(id=id_recibido).delete()
+    return JsonResponse({
+        'tarea_eliminar':tarea_eliminar_lista
     })

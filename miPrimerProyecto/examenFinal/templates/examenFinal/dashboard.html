@@ -183,12 +183,12 @@
                 info_tarea = data.tarea
                 let nueva_fila = `
                 <tr>
-                    <td scope="row">${info_tarea[0]}</td>
-                    <td>${info_tarea[1]}</td>
-                    <td>${info_tarea[3]}</td>
-                    <td style="text-align: center;"><a id="{{ tarea.id }}" class="btn btn-info" style="color: black;" data-bs-toggle="modal" data-bs-target="#verDetalle" onclick="mostrarDetalle(this.id)"><i class="fa fa-eye"></i></a></td>
-                    <td style="text-align: center;"><a id="{{ tarea.id }}" class="btn btn-warning" style="color: black;" data-bs-toggle="modal" data-bs-target="#editarTarea" onclick="editarTarea(this.id)"><i class="fa fa-edit"></i></a></td>
-                    <td style="text-align: center;"><a id="{{ tarea.id }}" class="btn btn-danger" style="color: white;" onclick="eliminarTarea(this.id)"><i class="fa fa-trash"></i></a></td>
+                    <td scope="row">${info_tarea[1]}</td>
+                    <td>${info_tarea[2]}</td>
+                    <td>${info_tarea[4]}</td>
+                    <td style="text-align: center;"><a id="${info_tarea[0]}" class="btn btn-info" style="color: black;" data-bs-toggle="modal" data-bs-target="#verDetalle" onclick="mostrarDetalle(this.id)"><i class="fa fa-eye"></i></a></td>
+                    <td style="text-align: center;"><a id="${info_tarea[0]}" class="btn btn-warning" style="color: black;" data-bs-toggle="modal" data-bs-target="#editarTarea" onclick="editarTarea(this.id)"><i class="fa fa-edit"></i></a></td>
+                    <td style="text-align: center;"><a id="${info_tarea[0]}" class="btn btn-danger" style="color: white;" onclick="eliminarTarea(this.id)"><i class="fa fa-trash"></i></a></td>
                 </tr>
                 `
                 let tabla_tareas = document.querySelector('#tabla_tareas')
@@ -239,6 +239,24 @@
            function eliminarTarea(id_tarea)
            {
             console.log(id_tarea)
+            fetch(`/examenFinal/eliminarTarea?id=${id_tarea}`)
+            .then(response => response.json())
+            .then(data=>{
+                alert('Tarea eliminada')
+                let info_tarea = data.tarea_eliminar
+                let fila_eliminar = `
+                <tr>
+                    <td scope="row">${info_tarea[1]}</td>
+                    <td>${info_tarea[2]}</td>
+                    <td>${info_tarea[4]}</td>
+                    <td style="text-align: center;"><a id="${info_tarea[0]}" class="btn btn-info" style="color: black;" data-bs-toggle="modal" data-bs-target="#verDetalle" onclick="mostrarDetalle(this.id)"><i class="fa fa-eye"></i></a></td>
+                    <td style="text-align: center;"><a id="${info_tarea[0]}" class="btn btn-warning" style="color: black;" data-bs-toggle="modal" data-bs-target="#editarTarea" onclick="editarTarea(this.id)"><i class="fa fa-edit"></i></a></td>
+                    <td style="text-align: center;"><a id="${info_tarea[0]}" class="btn btn-danger" style="color: white;" onclick="eliminarTarea(this.id)"><i class="fa fa-trash"></i></a></td>
+                </tr>
+                `
+                let tabla_tareas = document.querySelector('#tabla_tareas')
+                tabla_tareas.innerHTML = tabla_tareas.innerHTML.replace(fila_eliminar,'');
+            })
            }
 
            //PREGUNTA 2-3
@@ -292,8 +310,8 @@
                     <td>{{ tarea.fechaEntrega }}</td>
                     <td>{{ tarea.estadoTarea }}</td>
                     <td style="text-align: center;"><a id="{{ tarea.id }}" class="btn btn-info" style="color: black;" data-bs-toggle="modal" data-bs-target="#verDetalle" onclick="mostrarDetalle(this.id)"><i class="fa fa-eye"></i></a></td>
-                    <td style="text-align: center;"><a id="editar{{ tarea.id }}" class="btn btn-warning" style="color: black;" data-bs-toggle="modal" data-bs-target="#editarTarea" onclick="editarTarea(this.id)"><i class="fa fa-edit"></i></a></td>
-                    <td style="text-align: center;"><a id="eliminar{{ tarea.id }}" class="btn btn-danger" style="color: white;" onclick="eliminarTarea(this.id)"><i class="fa fa-trash"></i></a></td>
+                    <td style="text-align: center;"><a id="{{ tarea.id }}" class="btn btn-warning" style="color: black;" data-bs-toggle="modal" data-bs-target="#editarTarea" onclick="editarTarea(this.id)"><i class="fa fa-edit"></i></a></td>
+                    <td style="text-align: center;"><a id="{{ tarea.id }}" class="btn btn-danger" style="color: white;" onclick="eliminarTarea(this.id)"><i class="fa fa-trash"></i></a></td>
                 </tr>
                 {% endfor %}
                 </tbody>
