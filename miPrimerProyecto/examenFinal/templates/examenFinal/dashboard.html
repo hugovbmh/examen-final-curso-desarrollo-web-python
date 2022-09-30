@@ -105,15 +105,13 @@
             <div class="container">
                 <div class="row">
                     <div class="col-xl-8 offset-xl-2">
-                        
-                        <form id="contact-form" method="post" action="#" role="form" novalidate="true">
-                            {% csrf_token %}
                             <div class="controls">
                                 <div class="row">
                                     <div class="col-lg-6">
                                         <div class="form-group">
                                             <label for="form_name">Descripción de la tarea</label>
-                                            <textarea id="nombreTarea" class="form-control" name="nombreTarea" style="height: 100px; width: 480px;"></textarea>
+                                            <textarea id="nombreTareaNuevo" class="form-control" name="nombreTarea" style="width: 480px;"></textarea>
+                                        
                                         </div>
                                     </div>
                                 </div>
@@ -121,14 +119,14 @@
                                     <div class="col-lg-6">
                                         <div class="form-group">
                                             <label for="form_email">Fecha de creación</label>
-                                            <input id="fechaCreacion" type="text" class="form-control" name="fechaCreacion">
+                                            <input id="fechaCreacionNuevo" type="text" class="form-control" name="fechaCreacion">
                                             
                                         </div>
                                     </div>
                                     <div class="col-lg-6">
                                         <div class="form-group">
                                             <label for="form_phone">Fecha de entrega</label>
-                                            <input id="fechaEntrega" type="text" class="form-control" name="fechaEntrega">
+                                            <input id="fechaEntregaNuevo" type="text" class="form-control" name="fechaEntrega">
                                             
                                         </div>
                                     </div>
@@ -137,12 +135,11 @@
                                     <div class="col-lg-6">
                                         <div class="form-group">
                                             <label for="form_email">Estado de la tarea</label>
-                                            <input id="estadoTarea" type="text"  class="form-control" name="estadoTarea">
+                                            <input id="estadoTareaNuevo" type="text"  class="form-control" name="estadoTarea">
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </form>
                     </div>
                 </div>
             </div>
@@ -150,15 +147,13 @@
             modal_NuevaTarea.innerHTML = nuevosElementos
             
             //Fin del codigo
-            $(".modal-backdrop").remove();
-            $('#nuevaTarea').hide()
            }
            function agregarTarea()
            {
-            let nombreTarea = document.getElementById('nombreTarea').value
-            let fechaCreacion = document.getElementById('fechaCreacion').value
-            let fechaEntrega = document.getElementById('fechaEntrega').value
-            let estadoTarea = document.getElementById('estadoTarea').value
+            let nombreTarea = document.getElementById('nombreTareaNuevo').value
+            let fechaCreacion = document.getElementById('fechaCreacionNuevo').value
+            let fechaEntrega = document.getElementById('fechaEntregaNuevo').value
+            let estadoTarea = document.getElementById('estadoTareaNuevo').value
 
             informacion_tarea = {
                 'descripcion':`${nombreTarea}`,
@@ -179,7 +174,6 @@
             .then(response => response.json())
             .then(data=>{
                 console.log(data)
-                eliminarNuevo()
                 info_tarea = data.tarea
                 let nueva_fila = `
                 <tr>
@@ -271,11 +265,101 @@
            */
            function editarTarea(id_tarea)
            {
-            console.log(id_tarea)
-            //El codigo inicia aqui
+            //Escribir su codigo aqui
+            console.log(id_tarea) // 1
+            fetch(`/examenFinal/editarTarea?id=${id_tarea}`)
+            .then(response => response.json())
+            .then(data => {
+                console.log('Editar tarea')
+                console.log(data)
+                let info_editar = data.tarea_detalle
+                let modal_editarTarea = document.querySelector('.modalEditarTarea')
+                let nuevosElementos = `
+                <div class="container">
+                    <div class="row">
+                        <div class="col-xl-8 offset-xl-2">
+                                <div class="controls">
+                                    <h3>Tarea ID: </h3>
+                                    <input value="${id_tarea}" id="idTarea" readonly>
+                                    <div class="row">
+                                        <div class="col-lg-6">
+                                            <div class="form-group">
+                                                <label for="form_name">Descripción de la tarea</label>
+                                                <textarea id="nombreTareaEditar" class="form-control" name="nombreTarea" style="width: 480px;"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>                                    
+                                    <div class="row">
+                                        <div class="col-lg-6">
+                                            <div class="form-group">
+                                                <label for="form_email">Fecha de creación</label>
+                                                <input id="fechaCreacionEditar" value="${info_editar.fechaCreacion}" type="text" class="form-control" name="fechaCreacion">
+                                                
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-6">
+                                            <div class="form-group">
+                                                <label for="form_phone">Fecha de entrega</label>
+                                                <input id="fechaEntregaEditar" value="${info_editar.fechaEntrega}" type="text" class="form-control" name="fechaEntrega">
+                                                
+                                            </div>
+                                        </div>
+                                    </div>
 
+                                    <div class="row">
+                                        <div class="col-lg-6">
+                                            <div class="form-group">
+                                                <label for="form_email">Estado de la tarea</label>
+                                                <input id="estadoTareaEditar" value="${info_editar.estadoTarea}" type="text"  class="form-control" name="estadoTarea">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                        </div>
+                    </div>
+                </div>
+                    `
+                modal_editarTarea.innerHTML = nuevosElementos
+
+                let message = document.getElementById('nombreTareaEditar')
+                message.value = info_editar.descripcion
+                })
+        }
+        function actualizarTarea()
+        {
+            let id_tarea = document.getElementById('idTarea').value
+
+            let nombreTarea = document.getElementById('nombreTareaEditar').value
+            let fechaCreacion = document.getElementById('fechaCreacionEditar').value
+            let fechaEntrega = document.getElementById('fechaEntregaEditar').value
+            let estadoTarea = document.getElementById('estadoTareaEditar').value
+            
+
+            informacion_tarea = {
+                'id': id_tarea,
+                'descripcion':`${nombreTarea}`,
+                'fechaCreacion':`${fechaCreacion}`,
+                'fechaEntrega':`${fechaEntrega}`,
+                'estadoTarea':`${estadoTarea}`
+            }
+            console.log(informacion_tarea)
+
+            fetch(`/examenFinal/actualizarTarea`,{
+                method:'POST',
+                headers:{
+                    "X-Request-With":"XMLHttpRequest",
+                    "X-CSRFToken":getCookie("csrftoken")
+                },
+                body:JSON.stringify(informacion_tarea)
+            })
+            .then(response => response.json())
+            .then(data => { console.log(data)
+                window.location.reload()
+                })
+            
+        }
             //Fin del codigo
-           }
+           
 
         </script>
 
@@ -357,17 +441,20 @@
     No olvidar crear un input readonly para mostrar el id de la tarea y enviarla al servidor
 -->
 <div class="modal fade" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" role="dialog" id="editarTarea">
-    <div class="modal-dialog " role="document">
+    <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Editar tarea</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="eliminarNuevo()"></button>
             </div>
             <div class="modal-body">
+                <div class="modalEditarTarea">
+                    
+                </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="submit" class="btn btn-primary">Actualizar</button>
+                <button type="button" class="btn btn-secondary"  data-bs-dismiss="modal" onclick="eliminarNuevo()">Cancelar</button>
+                <button type="submit" class="btn btn-primary"  data-bs-dismiss="modal" onclick="actualizarTarea()">Actualizar</button>
             </div>
         </div>
     </div>
@@ -396,7 +483,7 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="eliminarDetalle()">Cerrar</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="eliminarDetalle()" >Cerrar</button>
             </div>
         </div>
     </div>
